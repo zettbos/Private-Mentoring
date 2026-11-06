@@ -742,10 +742,86 @@ function syncNewFormMemberToDb3(rowId, nama, email, waRaw, waClean, countEmail, 
 
 /**
  * Pembersih dan Normalisasi Nomor Telepon WhatsApp Komprehensif
- * Mendukung string biasa, angka, JSON string & Unicode \u003a
+ * Mendukung nomor Indonesia (08xx, 628xx) & Internasional (Korea +82, Malaysia +60, Singapura +65, Brunei +673, dll)
  */
 function cleanPhone(waRaw) {
-  return extractPhoneFromText(waRaw);
+  if (!waRaw) return '';
+  if (waRaw instanceof Date) return '';
+  let str = waRaw.toString().trim().replace(/\\u003a/gi, ':');
+  if (!str) return '';
+
+  // Abaikan teks tanggal/jam murni
+  if (/^\d{1,4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,4}/.test(str)) {
+    return '';
+  }
+
+  // Jika berupa JSON atau ada kurung, ambil nomor HP dari dalamnya
+  try {
+    if (str.includes('{') || str.includes('[')) {
+      const digitMatches = str.match(/\+?\d{8,16}/g);
+      if (digitMatches && digitMatches.length > 0) {
+        str = digitMatches[0];
+      }
+    }
+  } catch (e) {}
+
+  const hadPlus = str.startsWith('+');
+  let digits = str.replace(/\D/g, '');
+  if (!digits || digits.length < 8 || digits.length > 16) return '';
+
+  // 1. Jika pengguna menginput awalan + (misal +821097879920, +60123456789, +628123456789)
+  if (hadPlus) {
+    if (digits.startsWith('6208')) return '628' + digits.substring(4);
+    return digits;
+  }
+
+  // 2. Awalan 00 (dial internasional)
+  if (digits.startsWith('00')) {
+    digits = digits.substring(2);
+  }
+
+  // 3. Nomor Indonesia standar: 08xx -> 628xx
+  if (digits.startsWith('08')) {
+    return '628' + digits.substring(2);
+  }
+
+  // 4. Nomor Korea Selatan: lokal 010-xxxx-xxxx (11 digit: 010 + 8 digit)
+  if (digits.startsWith('010') && digits.length === 11) {
+    return '8210' + digits.substring(3);
+  }
+
+  // 5. Nomor Malaysia: lokal 01x-xxxxxxx (10-11 digit, misal 011, 012, 014, 016, 017, 018, 019)
+  if (digits.startsWith('01') && digits.length >= 10 && digits.length <= 11) {
+    return '60' + digits.substring(1);
+  }
+
+  // 6. Nomor yang sebelumnya keliru di-replace dengan awalan 6210 (12 digit, misal 621097879920)
+  // Di Indonesia tidak ada awalan HP 6210. Ini adalah nomor Korea 010 yang salah diubah jadi 6210.
+  if (digits.startsWith('6210') && digits.length === 12) {
+    return '8210' + digits.substring(4);
+  }
+
+  // 7. Jika berawalan kode negara internasional sah
+  const intlPrefixes = ['62', '60', '65', '673', '82', '81', '886', '852', '61', '1', '44', '966', '971', '974'];
+  for (let i = 0; i < intlPrefixes.length; i++) {
+    const p = intlPrefixes[i];
+    if (digits.startsWith(p) && digits.length >= (p.length + 6)) {
+      if (p === '62' && digits.startsWith('6208')) return '628' + digits.substring(4);
+      return digits;
+    }
+  }
+
+  // 8. Awalan 8xx Indonesia (tanpa 0 di depan, misal 8123456789)
+  if (digits.startsWith('8') && !digits.startsWith('82026') && digits.length >= 9 && digits.length <= 13) {
+    return '62' + digits;
+  }
+
+  // 9. Awalan 0 biasa (fallback Indonesia)
+  if (digits.startsWith('0')) {
+    return '62' + digits.substring(1);
+  }
+
+  return digits;
 }
 
 /**
@@ -1909,19 +1985,27 @@ Silahkan daftar untuk mengakses:
 
 /**
  * Fungsi Pengirim HTTP Request ke API Fonnte dengan Simulasi Typing & Delay Random (15-25 Detik)
+ * Mendukung nomor Indonesia (62) dan nomor Internasional (Korea 82, Malaysia 60, Singapura 65, Brunei 673, dll)
  */
 function kirimKeFonnte(target, message, delaySeconds) {
   const cleanTarget = cleanPhone(target);
-  const localFormatTarget = cleanTarget.indexOf('62') === 0 ? ('0' + cleanTarget.substring(2)) : cleanTarget;
-  const safeDelay = delaySeconds ? delaySeconds : (Math.floor(Math.random() * 11) + 15);
+  if (!cleanTarget) {
+    return JSON.stringify({ status: false, reason: 'Nomor WhatsApp tujuan kosong atau tidak valid: ' + target });
+  }
+
+  const safeDelay = (delaySeconds !== null && delaySeconds !== undefined) 
+    ? String(delaySeconds) 
+    : String(Math.floor(Math.random() * 11) + 15);
   const zwChars = ['\u200B', '\u200C', '\u200D'];
   const antiSpamSuffix = zwChars[Math.floor(Math.random() * zwChars.length)] + zwChars[Math.floor(Math.random() * zwChars.length)];
 
+  // Set countryCode '0' dengan target nomor internasional lengkap (tanpa '+')
+  // agar Fonnte mengirim langsung ke nomor tujuan tanpa merusak/memaksa kode negara 62
   const payload = {
-    'target': localFormatTarget,
+    'target': cleanTarget,
     'message': String(message || '').trim() + antiSpamSuffix,
-    'countryCode': '62',
-    'delay': safeDelay.toString(),
+    'countryCode': '0',
+    'delay': safeDelay,
     'typing': 'true'
   };
 
@@ -2476,8 +2560,8 @@ function getUnfilledFormsData(sharedContext, forceFresh) {
             cleanedNo = rawLynkPhoneMap[cleanEmail] || rawLynkPhoneMap[cleanNama] || '';
           }
 
-          // 3. Pastikan hanya nomor valid (10-15 digit berawalan 628) yang dianggap valid
-          if (cleanedNo && (cleanedNo.length < 10 || !cleanedNo.startsWith('628'))) {
+          // 3. Pastikan nomor valid (8-16 digit, mendukung Indonesia & Internasional) yang disimpan
+          if (cleanedNo && (cleanedNo.length < 8 || cleanedNo.length > 16)) {
             cleanedNo = '';
           }
 
@@ -2551,14 +2635,14 @@ function extractPhoneFromRowData(row) {
   }
   if (row.length > 18 && row[18]) {
     const pS = extractPhoneFromText(row[18]);
-    if (pS && pS.length >= 10) return pS;
+    if (pS && pS.length >= 8) return pS;
   }
 
   // 2. Memindai sel dari index 15 ke atas (area kolom kontak Lynk.id)
   for (let c = 15; c < row.length; c++) {
     if (row[c]) {
       const p = extractPhoneFromText(row[c]);
-      if (p && p.length >= 10) return p;
+      if (p && p.length >= 8) return p;
     }
   }
 
@@ -2567,7 +2651,7 @@ function extractPhoneFromRowData(row) {
     if (c === 14) continue; // Lewati kolom tanggal transaksi mentah
     if (row[c]) {
       const p = extractPhoneFromText(row[c]);
-      if (p && p.length >= 10) return p;
+      if (p && p.length >= 8) return p;
     }
   }
 
@@ -2585,50 +2669,7 @@ function parseSheetDate(val) {
  * Helper ekstraksi nomor HP presisi dari teks JSON & string biasa (Anti-Salah Tanggal)
  */
 function extractPhoneFromText(txt) {
-  if (!txt) return '';
-  if (txt instanceof Date) return ''; // Lindungi Date object
-
-  let str = txt.toString().trim().replace(/\\u003a/gi, ':');
-  if (!str) return '';
-
-  // Abaikan teks tanggal/jam murni
-  if (/^\d{1,4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,4}/.test(str)) {
-    return '';
-  }
-
-  try {
-    if (str.includes('{') || str.includes('[')) {
-      const digitMatches = str.match(/\d{10,15}/g);
-      if (digitMatches && digitMatches.length > 0) {
-        for (let i = 0; i < digitMatches.length; i++) {
-          const d = digitMatches[i];
-          if (d.startsWith('628') || d.startsWith('08') || d.startsWith('8')) {
-            str = d;
-            break;
-          }
-        }
-      }
-    }
-  } catch (e) {}
-
-  // Cocokkan pola nomor HP Indonesia yang sah (minimal 10 digit, maksimal 15 digit)
-  const m = str.match(/(?:\+?628|08|8[1-9])[\d\s\-]{8,13}\d/);
-  if (m) str = m[0];
-
-  let digits = str.replace(/\D/g, '');
-  if (!digits || digits.length < 10 || digits.length > 15) return '';
-
-  if (digits.startsWith('6208')) {
-    digits = '628' + digits.substring(4);
-  } else if (digits.startsWith('08')) {
-    digits = '628' + digits.substring(2);
-  } else if (digits.startsWith('8') && !digits.startsWith('82026')) {
-    digits = '62' + digits;
-  } else if (!digits.startsWith('628')) {
-    return ''; // Bukan nomor HP Indonesia sah
-  }
-
-  return (digits.length >= 10 && digits.length <= 15) ? digits : '';
+  return cleanPhone(txt);
 }
 
 /**
