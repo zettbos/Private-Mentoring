@@ -1,0 +1,9 @@
+﻿ZettbosAdminApp/.gradle/
+ZettbosAdminApp/build/
+ZettbosAdminApp/app/build/
+ZettbosAdminApp/local.properties
+*.apk
+*.aab
+*.jks
+*.keystore
+.DS_Store
