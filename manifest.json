@@ -26,8 +26,8 @@
   ],
   "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ec4e53b7",
   "scope_extensions": [
-    { "origin": "https://zettbos.github.io" },
-    { "origin": "https://api.fonnte.com" }
+    { "origin": "*.github.io" },
+    { "origin": "*.fonnte.com" }
   ],
   "share_target": {
     "action": "https://zettbos.github.io/Private-Mentoring/",
