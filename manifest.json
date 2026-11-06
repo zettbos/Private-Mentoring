@@ -3,15 +3,13 @@
   "name": "Zettbos Private Mentoring",
   "short_name": "Zettbos Admin",
   "description": "Dashboard Pemantauan & Aktivitas Private Mentoring Zettbos",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "https://zettbos.github.io/Private-Mentoring/",
+  "scope": "https://zettbos.github.io/Private-Mentoring/",
   "lang": "id",
   "dir": "ltr",
   "display": "standalone",
   "display_override": [
-    "window-controls-overlay",
-    "standalone",
-    "minimal-ui"
+    "standalone"
   ],
   "background_color": "#0c0c0e",
   "theme_color": "#0c0c0e",

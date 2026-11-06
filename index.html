@@ -3400,10 +3400,14 @@
   </div>
   <script>
     (function() {
-      var isApk = (typeof window.Android !== 'undefined');
-      window._isAndroidApk = isApk;
+      var isStandalone = (typeof window.Android !== 'undefined') ||
+                         (window.matchMedia && (window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: fullscreen)').matches)) ||
+                         (window.navigator && window.navigator.standalone === true) ||
+                         (document.referrer && document.referrer.indexOf('android-app://') !== -1) ||
+                         (window.navigator && window.navigator.userAgent && window.navigator.userAgent.indexOf('ZettbosAdminApp') !== -1);
+      window._isAndroidApk = isStandalone;
       window._apkInitialBootDone = false;
-      if (isApk) {
+      if (isStandalone) {
         document.documentElement.classList.add('is-android-apk', 'boot-phase');
         document.body.classList.remove('app-loading');
         document.body.classList.add('loaded', 'is-android-apk-boot');
