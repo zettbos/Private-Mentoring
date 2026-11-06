@@ -2039,23 +2039,58 @@ function kirimKeFonnte(target, message, delaySeconds) {
 function checkTikTokLiveStatusServer(username) {
   const cleanUser = String(username || 'zettbos').trim().replace(/^@+/, '') || 'zettbos';
   try {
-    const url = 'https://www.tiktok.com/@' + encodeURIComponent(cleanUser) + '/live';
-    const resp = UrlFetchApp.fetch(url, {
-      method: 'get',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8'
-      },
-      followRedirects: true,
-      muteHttpExceptions: true
-    });
-    const html = resp.getContentText() || '';
-    const roomMatch = html.match(/"roomId"\s*:\s*"(\d+)"/);
-    const statusMatch = html.match(/"status"\s*:\s*(\d+)/);
-    const roomId = roomMatch ? roomMatch[1] : '';
-    const statusCode = statusMatch ? parseInt(statusMatch[1], 10) : 0;
-    // Di TikTok Webcast, status === 2 menandakan Room sedang LIVE aktif
-    const isNowLive = !!(roomId && statusCode === 2);
+    let isNowLive = false;
+    let roomId = '';
+    let liveTitle = '';
+
+    // 1. Cek via TikTok Official Webcast API Endpoint (Bypass WAF Anti-Bot Challenge)
+    try {
+      const apiUrl = 'https://www.tiktok.com/api-live/user/room?aid=1988&uniqueId=' + encodeURIComponent(cleanUser) + '&sourceType=54';
+      const apiResp = UrlFetchApp.fetch(apiUrl, {
+        method: 'get',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Referer': 'https://www.tiktok.com/'
+        },
+        muteHttpExceptions: true
+      });
+      const apiText = apiResp.getContentText() || '';
+      if (apiText && apiText.trim().startsWith('{')) {
+        const parsed = JSON.parse(apiText);
+        const user = parsed && parsed.data ? parsed.data.user : null;
+        const liveRoom = parsed && parsed.data ? parsed.data.liveRoom : null;
+        roomId = (user && user.roomId) ? String(user.roomId) : '';
+        const userStatus = (user && user.status !== undefined) ? Number(user.status) : 0;
+        const roomStatus = (liveRoom && liveRoom.status !== undefined) ? Number(liveRoom.status) : 0;
+        // Status 2 di Webcast menandakan sedang Live aktif
+        isNowLive = (roomStatus === 2 || userStatus === 2) && Boolean(roomId && roomId !== '0');
+        liveTitle = (liveRoom && liveRoom.title) ? liveRoom.title : '';
+      }
+    } catch (eApi) {
+      Logger.log("API check failed, trying HTML fallback: " + eApi.toString());
+    }
+
+    // 2. Fallback ke HTML scraping jika API gagal
+    if (!roomId) {
+      try {
+        const pageUrl = 'https://www.tiktok.com/@' + encodeURIComponent(cleanUser) + '/live';
+        const pageResp = UrlFetchApp.fetch(pageUrl, {
+          method: 'get',
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8'
+          },
+          followRedirects: true,
+          muteHttpExceptions: true
+        });
+        const html = pageResp.getContentText() || '';
+        const roomMatch = html.match(/"roomId"\s*:\s*"(\d+)"/);
+        const statusMatch = html.match(/"status"\s*:\s*(\d+)/);
+        if (roomMatch) roomId = roomMatch[1];
+        const statusCode = statusMatch ? parseInt(statusMatch[1], 10) : 0;
+        if (roomId && statusCode === 2) isNowLive = true;
+      } catch (eHtml) {}
+    }
 
     const scriptProps = PropertiesService.getScriptProperties();
     const prevLiveStr = scriptProps.getProperty('TIKTOK_IS_LIVE_' + cleanUser.toUpperCase()) || 'false';
@@ -2067,7 +2102,7 @@ function checkTikTokLiveStatusServer(username) {
       sendFcmNotification(
         '🔴 TikTok @' + cleanUser + ' Sedang LIVE!',
         'Sesi LIVE TikTok @' + cleanUser + ' baru saja dimulai! Admin silakan bersiap memantau pendaftar & transaksi masuk.',
-        { type: 'tiktok_live_start', username: cleanUser, roomId: roomId }
+        { type: 'tiktok_live_start', username: cleanUser, roomId: roomId, title: liveTitle }
       );
     } else if (wasLive && !isNowLive) {
       scriptProps.setProperty('TIKTOK_IS_LIVE_' + cleanUser.toUpperCase(), 'false');
@@ -2085,7 +2120,7 @@ function checkTikTokLiveStatusServer(username) {
       username: cleanUser,
       isLive: isNowLive,
       roomId: roomId,
-      statusCode: statusCode,
+      title: liveTitle,
       checkedAt: new Date().toISOString()
     };
   } catch (err) {
