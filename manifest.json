@@ -1,13 +1,25 @@
 {
+  "id": "https://zettbos.github.io/Private-Mentoring/",
   "name": "Zettbos Private Mentoring",
   "short_name": "Zettbos Admin",
   "description": "Dashboard Pemantauan & Aktivitas Private Mentoring Zettbos",
   "start_url": "./index.html",
   "scope": "./",
+  "lang": "id",
+  "dir": "ltr",
   "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
   "background_color": "#0c0c0e",
   "theme_color": "#0c0c0e",
   "orientation": "portrait",
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "icons": [
     {
       "src": "icon-192.png",
@@ -26,6 +38,60 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Antrean Tindakan",
+      "short_name": "Tindakan",
+      "description": "Buka antrean member perlu tindakan",
+      "url": "./index.html#queue",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Pembelian Lynk.id",
+      "short_name": "Lynk.id",
+      "description": "Buka rekap transaksi Lynk.id",
+      "url": "./index.html#unfilled",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Whitelist LMS",
+      "short_name": "Whitelist",
+      "description": "Buka antrean whitelist member",
+      "url": "./index.html#whitelist",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tampilan Mobile Antrean Member Zettbos"
+    },
+    {
+      "src": "screenshot-wide.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Tampilan Desktop Dashboard Pemantauan Zettbos"
     }
   ],
   "categories": [
