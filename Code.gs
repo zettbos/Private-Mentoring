@@ -769,6 +769,18 @@ function cleanPhone(waRaw) {
   let digits = str.replace(/\D/g, '');
   if (!digits || digits.length < 8 || digits.length > 16) return '';
 
+  // 0. KOREKSI KHUSUS INTERNASIONAL SEBELUM PENGECEKAN LAIN
+  // Di Indonesia TIDAK ADA nomor HP berawalan 6210. 
+  // Nomor seperti +621097879920 atau 621097879920 adalah nomor Korea Selatan (010) yang salah diberi awalan 62.
+  if (digits.startsWith('6210') && digits.length === 12) {
+    return '8210' + digits.substring(4);
+  }
+
+  // Koreksi nomor Malaysia yang salah diberi awalan 6201 (misal 620123456789 -> 60123456789)
+  if (digits.startsWith('6201') && digits.length >= 11 && digits.length <= 12) {
+    return '601' + digits.substring(4);
+  }
+
   // 1. Jika pengguna menginput awalan + (misal +821097879920, +60123456789, +628123456789)
   if (hadPlus) {
     if (digits.startsWith('6208')) return '628' + digits.substring(4);

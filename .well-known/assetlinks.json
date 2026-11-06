@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.zettbos.twa",
+      "sha256_cert_fingerprints": [
+        "65:2C:DC:75:CC:40:5B:6C:47:07:2C:46:69:4D:7D:87:01:9E:3E:9D:BE:45:5B:B8:FA:4A:30:9A:AD:E3:43:5C"
+      ]
+    }
+  }
+]

@@ -9,12 +9,41 @@
   "dir": "ltr",
   "display": "standalone",
   "display_override": [
-    "standalone"
+    "standalone",
+    "minimal-ui",
+    "browser"
   ],
   "background_color": "#0c0c0e",
   "theme_color": "#0c0c0e",
   "orientation": "portrait",
   "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=io.github.zettbos.twa",
+      "id": "io.github.zettbos.twa"
+    }
+  ],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ec4e53b7",
+  "scope_extensions": [
+    { "origin": "https://zettbos.github.io" },
+    { "origin": "https://api.fonnte.com" }
+  ],
+  "share_target": {
+    "action": "https://zettbos.github.io/Private-Mentoring/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+zettbos",
+      "url": "https://zettbos.github.io/Private-Mentoring/?action=%s"
+    }
+  ],
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
