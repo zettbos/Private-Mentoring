@@ -5,17 +5,26 @@
   <meta charset="UTF-8">
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#0c0c0e">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="Sistem Manajemen Admin, Antrean Member, Whitelist LMS, Fonnte WhatsApp & Monitor TikTok Live Zettbos Private Mentoring.">
   <title>Zettbos Private Mentoring - Admin Dashboard</title>
 
-  <!-- Web App Manifest & PWA Icons (100% Microsoft PWABuilder Ready) -->
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon-192.png">
+  <!-- PWA Web App Manifest & Mobile Capability for PWABuilder -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0c0c0e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Zettbos Admin">
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          console.log('Zettbos PWA Service Worker ready:', reg.scope);
+        }).catch((err) => {
+          console.warn('PWA Service Worker register error:', err);
+        });
+      });
+    }
+  </script>
 
   <!-- App Icon / Favicon (Identik dengan Logo APK Android) -->
   <link rel="icon" type="image/png" sizes="64x64" href="data:image/png;base64,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">
@@ -27,25 +36,6 @@
     try {
       localStorage.removeItem('ZETTBOS_LATEST_HTML');
     } catch(e) {}
-
-    // Registrasi PWA Service Worker (Standar Microsoft PWABuilder + Offline Cache + Push Notification)
-    window._pwaSwRegistration = null;
-    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('./sw.js').then(function(reg) {
-          window._pwaSwRegistration = reg;
-          navigator.serviceWorker.addEventListener('message', function(evt) {
-            if (evt.data && evt.data.type === 'FLUSH_OFFLINE_QUEUE' && typeof flushOfflineActionQueue === 'function') {
-              flushOfflineActionQueue();
-            } else if (evt.data && evt.data.type === 'PERIODIC_LIVE_CHECK' && typeof checkTikTokLiveStatusNow === 'function') {
-              checkTikTokLiveStatusNow(false);
-            }
-          });
-        }).catch(function(err) {
-          console.warn('SW register info:', err);
-        });
-      });
-    }
   </script>
 
   <!-- Import Google Font Noto Serif JP & Inter -->
@@ -5372,25 +5362,15 @@
         } catch (e) {}
       }
 
-      // 2. Notifikasi Push PWA Service Worker (PWABuilder Android APK) & Web Browser
+      // 2. Notifikasi Push Web Browser
       if (typeof window.Notification !== 'undefined') {
-        const showSwNotif = () => {
-          if (window._pwaSwRegistration && typeof window._pwaSwRegistration.showNotification === 'function') {
-            window._pwaSwRegistration.showNotification(title, {
-              body: body,
-              icon: './icon-192.png',
-              badge: './icon-192.png',
-              vibrate: [200, 100, 200]
-            }).catch(() => {});
-          } else {
-            try { new Notification(title, { body: body, icon: './icon-192.png' }); } catch (e) {}
-          }
-        };
         if (Notification.permission === 'granted') {
-          showSwNotif();
+          try { new Notification(title, { body: body }); } catch (e) {}
         } else if (Notification.permission !== 'denied') {
           Notification.requestPermission().then(p => {
-            if (p === 'granted') showSwNotif();
+            if (p === 'granted') {
+              try { new Notification(title, { body: body }); } catch (e) {}
+            }
           }).catch(() => {});
         }
       }
