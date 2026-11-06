@@ -7,3 +7,5 @@ ZettbosAdminApp/local.properties
 *.jks
 *.keystore
 .DS_Store
+
+ZettbosAdminApp/

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="Theme.ZettbosAdmin" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowBackground">@color/zettbos_bg</item>
-        <item name="android:colorBackground">@color/zettbos_bg</item>
-        <item name="android:statusBarColor">@color/zettbos_bg</item>
-        <item name="android:navigationBarColor">@color/zettbos_bg</item>
-    </style>
-</resources>

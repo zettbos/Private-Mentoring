@@ -1,0 +1,97 @@
+{
+  "id": "/Private-Mentoring/",
+  "name": "Zettbos Private Mentoring",
+  "short_name": "Zettbos Admin",
+  "description": "Sistem Manajemen Admin, Antrean Member, Whitelist LMS, Fonnte WhatsApp & Monitor TikTok Live Zettbos Private Mentoring.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "portrait",
+  "background_color": "#0c0c0e",
+  "theme_color": "#0c0c0e",
+  "dir": "ltr",
+  "lang": "id",
+  "categories": [
+    "business",
+    "productivity",
+    "education"
+  ],
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./screenshot-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dashboard & Antrean Admin Zettbos Private Mentoring"
+    },
+    {
+      "src": "./screenshot-wide.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Panel Kendali Desktop Zettbos Private Mentoring"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Antrean Perlu Tindakan",
+      "short_name": "Antrean",
+      "description": "Buka daftar member baru & transaksi Lynk.id",
+      "url": "./index.html#queue",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Setelan & Fonnte WA",
+      "short_name": "Setelan",
+      "description": "Kelola Fonnte WhatsApp, Database 3 & TikTok Live",
+      "url": "./index.html#settings",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
