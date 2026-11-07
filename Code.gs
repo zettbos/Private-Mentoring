@@ -2097,21 +2097,41 @@ function checkTikTokLiveStatusServer(username) {
     const wasLive = (prevLiveStr === 'true');
 
     if (!wasLive && isNowLive) {
+      const nowMs = Date.now();
       scriptProps.setProperty('TIKTOK_IS_LIVE_' + cleanUser.toUpperCase(), 'true');
-      scriptProps.setProperty('TIKTOK_LIVE_START_' + cleanUser.toUpperCase(), String(Date.now()));
+      scriptProps.setProperty('TIKTOK_LIVE_START_' + cleanUser.toUpperCase(), String(nowMs));
+      let startTimeStr = '';
+      try {
+        startTimeStr = Utilities.formatDate(new Date(nowMs), "Asia/Jakarta", "HH:mm") + " WIB";
+      } catch (eTime) {
+        startTimeStr = new Date(nowMs).toLocaleTimeString('id-ID') + ' WIB';
+      }
       sendFcmNotification(
-        '🔴 TikTok @' + cleanUser + ' Sedang LIVE!',
-        'Sesi LIVE TikTok @' + cleanUser + ' baru saja dimulai! Admin silakan bersiap memantau pendaftar & transaksi masuk.',
-        { type: 'tiktok_live_start', username: cleanUser, roomId: roomId, title: liveTitle }
+        '🔴 @' + cleanUser + ' Mulai LIVE',
+        'Mulai: ' + startTimeStr,
+        { type: 'tiktok_live_start', username: cleanUser, roomId: roomId, startTime: startTimeStr }
       );
     } else if (wasLive && !isNowLive) {
       scriptProps.setProperty('TIKTOK_IS_LIVE_' + cleanUser.toUpperCase(), 'false');
       const startMs = Number(scriptProps.getProperty('TIKTOK_LIVE_START_' + cleanUser.toUpperCase()) || 0);
-      const durMin = startMs > 0 ? Math.max(1, Math.round((Date.now() - startMs) / 60000)) : 0;
+      const nowMs = Date.now();
+      let durationStr = 'Beberapa menit';
+      if (startMs > 0) {
+        const totalMin = Math.max(1, Math.round((nowMs - startMs) / 60000));
+        const hours = Math.floor(totalMin / 60);
+        const mins = totalMin % 60;
+        if (hours > 0 && mins > 0) {
+          durationStr = hours + ' jam ' + mins + ' menit';
+        } else if (hours > 0) {
+          durationStr = hours + ' jam';
+        } else {
+          durationStr = mins + ' menit';
+        }
+      }
       sendFcmNotification(
-        '⏹️ LIVE TikTok @' + cleanUser + ' Selesai',
-        'Sesi LIVE TikTok @' + cleanUser + ' telah berakhir' + (durMin ? ' (Durasi: ~' + durMin + ' menit)' : '') + '. Silakan cek rekap antrean.',
-        { type: 'tiktok_live_end', username: cleanUser }
+        '⏹️ @' + cleanUser + ' LIVE Selesai',
+        'Durasi: ' + durationStr,
+        { type: 'tiktok_live_end', username: cleanUser, duration: durationStr }
       );
     }
 

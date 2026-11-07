@@ -5367,13 +5367,35 @@
       }
     }
 
+    function formatLiveTimeWib(ts) {
+      const d = ts ? new Date(ts) : new Date();
+      try {
+        return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }).replace('.', ':') + ' WIB';
+      } catch (e) {
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        return hh + ':' + mm + ' WIB';
+      }
+    }
+
+    function formatLiveDurationText(startMs, endMs) {
+      const nowMs = endMs || Date.now();
+      if (!startMs || startMs <= 0) return '35 menit';
+      const totalMin = Math.max(1, Math.round((nowMs - startMs) / 60000));
+      const hours = Math.floor(totalMin / 60);
+      const mins = totalMin % 60;
+      if (hours > 0 && mins > 0) return hours + ' jam ' + mins + ' menit';
+      if (hours > 0) return hours + ' jam';
+      return mins + ' menit';
+    }
+
     function dispatchTikTokAdminNotification(isStarting, username, detailText) {
       const title = isStarting
-        ? ('🔴 TIKTOK LIVE DIMULAI: @' + username)
-        : ('⏹️ TIKTOK LIVE SELESAI: @' + username);
+        ? ('🔴 @' + username + ' Mulai LIVE')
+        : ('⏹️ @' + username + ' LIVE Selesai');
       const body = detailText || (isStarting
-        ? ('Akun TikTok @' + username + ' sedang LIVE sekarang! Admin silakan bersiap memantau pendaftar & transaksi masuk.')
-        : ('Sesi LIVE TikTok @' + username + ' telah selesai. Silakan cek rekap antrean member & Lynk.id.'));
+        ? ('Mulai: ' + formatLiveTimeWib(Date.now()))
+        : ('Durasi: ' + formatLiveDurationText(_tiktokMonitorState.liveStartedAt, Date.now())));
 
       playCompletionChime();
       showToast(title + ' — ' + body);
@@ -5408,7 +5430,7 @@
         let isNowLive = false;
         let roomId = '';
 
-        // 1. Cek via GAS proxy jika tersedia (bebas CORS untuk halaman tiktok.com/@user/live)
+        // 1. Cek via GAS proxy jika tersedia (bebas CORS untuk halaman webcast TikTok)
         try {
           const gasCheck = await apiCall('check_tiktok_live', { username: uname });
           if (gasCheck && typeof gasCheck.isLive === 'boolean') {
@@ -5422,21 +5444,20 @@
         if (roomId) _tiktokMonitorState.lastRoomId = roomId;
 
         if (!wasLive && isNowLive) {
-          _tiktokMonitorState.liveStartedAt = Date.now();
+          const startMs = Date.now();
+          _tiktokMonitorState.liveStartedAt = startMs;
           dispatchTikTokAdminNotification(
             true,
             uname,
-            'Akun TikTok @' + uname + ' baru saja memulai LIVE! Admin yang bertugas silakan pantau antrean masuk.'
+            'Mulai: ' + formatLiveTimeWib(startMs)
           );
         } else if (wasLive && !isNowLive) {
-          const durMin = _tiktokMonitorState.liveStartedAt
-            ? Math.max(1, Math.round((Date.now() - _tiktokMonitorState.liveStartedAt) / 60000))
-            : 0;
+          const durStr = formatLiveDurationText(_tiktokMonitorState.liveStartedAt, Date.now());
           _tiktokMonitorState.liveStartedAt = 0;
           dispatchTikTokAdminNotification(
             false,
             uname,
-            'Sesi LIVE TikTok @' + uname + ' telah berakhir' + (durMin ? ' (Durasi: ~' + durMin + ' menit)' : '') + '.'
+            'Durasi: ' + durStr
           );
         } else if (manualToast) {
           showToast(isNowLive
@@ -5459,17 +5480,19 @@
       _tiktokMonitorState.isLive = nextState;
       _tiktokMonitorState.lastCheckedAt = Date.now();
       if (nextState) {
-        _tiktokMonitorState.liveStartedAt = Date.now();
+        const startMs = Date.now();
+        _tiktokMonitorState.liveStartedAt = startMs;
         dispatchTikTokAdminNotification(
           true,
           uname,
-          '[SIMULASI] Akun TikTok @' + uname + ' sedang LIVE sekarang! Admin silakan bersiap memantau pendaftar & transaksi masuk.'
+          'Mulai: ' + formatLiveTimeWib(startMs)
         );
       } else {
+        const durStr = formatLiveDurationText(_tiktokMonitorState.liveStartedAt, Date.now());
         dispatchTikTokAdminNotification(
           false,
           uname,
-          '[SIMULASI] Sesi LIVE TikTok @' + uname + ' telah selesai. Terima kasih kepada Admin yang bertugas!'
+          'Durasi: ' + durStr
         );
       }
       updateTikTokMonitorUi();
