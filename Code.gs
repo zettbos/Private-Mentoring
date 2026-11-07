@@ -28,8 +28,8 @@ const PRIMARY_ADMIN_PHONE = (function() {
 const DEFAULT_MENTORING_DB_URL = 'https://anshbrwbtoxgvnyrrnfn.supabase.co';
 const DEFAULT_MENTORING_DB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuc2hicndidG94Z3ZueXJybmZuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MzI2MjMyMSwiZXhwIjoyMTA4ODM4MzIxfQ.x0AxM0og19Nr7tnEN5HZWvNuWW6XpTLAapAFu9rb2uE';
 
-const CLOUD_APP_VERSION = '3.9.18'; // <--- Versi Sistem Cloud Terbaru
-const CLOUD_RELEASE_NOTES = 'Pembaruan v3.9.18: Integrasi Langsung Fonnte WA API, Kunci Antrean Perlu Tindakan 24 Jam/Konfirmasi Manual, Perbaikan Tanggal & Anti Auto-Remark Lynk.id, Auto-Retry Whitelist LMS, serta Arsitektur Supabase-First & Offline Queue.';
+const CLOUD_APP_VERSION = '3.9.19'; // <--- Versi Sistem Cloud Terbaru
+const CLOUD_RELEASE_NOTES = 'Pembaruan v3.9.19: Monitor TikTok LIVE Otomatis dengan notifikasi ringkas waktu mulai & durasi siaran, serta tautan langsung siaran langsung vt.tiktok.com.';
 
 /**
  * Router API Web App (Mendukung GET dan POST untuk REST API & HTML View)
