@@ -4041,6 +4041,9 @@
               <button class="action-btn btn-custom" style="flex: 1 1 140px; justify-content: center; color: var(--accent-gold); border-color: var(--border-gold);" onclick="simulateTikTokLiveAlert()">
                 <i data-lucide="bell"></i> Tes Notif Live
               </button>
+              <a href="https://vt.tiktok.com/ZS9f8qEThx6Mv-Zc8fJ/" target="_blank" rel="noopener noreferrer" class="action-btn btn-custom" style="flex: 1 1 100%; justify-content: center; color: #f43f5e; border-color: rgba(244, 63, 94, 0.4); text-decoration: none; margin-top: 2px;">
+                <i data-lucide="external-link"></i> Buka Link LIVE TikTok (vt.tiktok.com)
+              </a>
             </div>
           </div>
 
@@ -5362,7 +5365,8 @@
         const lastCheckStr = _tiktokMonitorState.lastCheckedAt
           ? new Date(_tiktokMonitorState.lastCheckedAt).toLocaleTimeString('id-ID')
           : 'Baru saja';
-        box.innerHTML = (isLive ? '🔴 <strong>SEDANG LIVE SEKARANG!</strong>' : '📡 Status: <strong>Tidak Sedang Live (Offline)</strong>') +
+        const liveLinkHtml = ' • <a href="https://vt.tiktok.com/ZS9f8qEThx6Mv-Zc8fJ/" target="_blank" rel="noopener noreferrer" style="color:#ef4444; font-weight:700; text-decoration:underline;">Tonton Siaran Langsung &rarr;</a>';
+        box.innerHTML = (isLive ? ('🔴 <strong>SEDANG LIVE SEKARANG!</strong>' + liveLinkHtml) : '📡 Status: <strong>Tidak Sedang Live (Offline)</strong>') +
           ' • Akun: <strong>@' + escapeHtml(uname) + '</strong> • Dicek: ' + escapeHtml(lastCheckStr);
       }
     }
@@ -5410,12 +5414,19 @@
 
       // 2. Notifikasi Push Web Browser
       if (typeof window.Notification !== 'undefined') {
+        const liveUrl = 'https://vt.tiktok.com/ZS9f8qEThx6Mv-Zc8fJ/';
         if (Notification.permission === 'granted') {
-          try { new Notification(title, { body: body }); } catch (e) {}
+          try {
+            const notif = new Notification(title, { body: body, icon: 'icon-192.png' });
+            notif.onclick = function() { window.open(liveUrl, '_blank'); };
+          } catch (e) {}
         } else if (Notification.permission !== 'denied') {
           Notification.requestPermission().then(p => {
             if (p === 'granted') {
-              try { new Notification(title, { body: body }); } catch (e) {}
+              try {
+                const notif = new Notification(title, { body: body, icon: 'icon-192.png' });
+                notif.onclick = function() { window.open(liveUrl, '_blank'); };
+              } catch (e) {}
             }
           }).catch(() => {});
         }

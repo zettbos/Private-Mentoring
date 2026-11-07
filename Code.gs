@@ -451,6 +451,14 @@ function sendFcmNotification(title, body, dataPayload) {
           }
         };
 
+        if (cleanData.url) {
+          messageObj.webpush = {
+            fcm_options: {
+              link: cleanData.url
+            }
+          };
+        }
+
         if (false) {
           // Topic admin_notif delivers to all installed devices
         } else {
@@ -2109,7 +2117,13 @@ function checkTikTokLiveStatusServer(username) {
       sendFcmNotification(
         '🔴 @' + cleanUser + ' Mulai LIVE',
         'Mulai: ' + startTimeStr,
-        { type: 'tiktok_live_start', username: cleanUser, roomId: roomId, startTime: startTimeStr }
+        {
+          type: 'tiktok_live_start',
+          username: cleanUser,
+          roomId: roomId,
+          startTime: startTimeStr,
+          url: 'https://vt.tiktok.com/ZS9f8qEThx6Mv-Zc8fJ/'
+        }
       );
     } else if (wasLive && !isNowLive) {
       scriptProps.setProperty('TIKTOK_IS_LIVE_' + cleanUser.toUpperCase(), 'false');
@@ -2131,7 +2145,12 @@ function checkTikTokLiveStatusServer(username) {
       sendFcmNotification(
         '⏹️ @' + cleanUser + ' LIVE Selesai',
         'Durasi: ' + durationStr,
-        { type: 'tiktok_live_end', username: cleanUser, duration: durationStr }
+        {
+          type: 'tiktok_live_end',
+          username: cleanUser,
+          duration: durationStr,
+          url: 'https://vt.tiktok.com/ZS9f8qEThx6Mv-Zc8fJ/'
+        }
       );
     }
 
