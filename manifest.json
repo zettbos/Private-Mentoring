@@ -1,0 +1,112 @@
+{
+  "id": "https://zettbos.github.io/Private-Mentoring/",
+  "name": "Zettbos Private Mentoring",
+  "short_name": "Zettbos Admin",
+  "description": "Dashboard Pemantauan & Aktivitas Private Mentoring Zettbos",
+  "start_url": "https://zettbos.github.io/Private-Mentoring/",
+  "scope": "https://zettbos.github.io/Private-Mentoring/",
+  "lang": "id",
+  "dir": "ltr",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
+  "background_color": "#0c0c0e",
+  "theme_color": "#0c0c0e",
+  "orientation": "portrait",
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=io.github.zettbos.twa",
+      "id": "io.github.zettbos.twa"
+    }
+  ],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ec4e53b7",
+  "scope_extensions": [
+    { "origin": "*.github.io" },
+    { "origin": "*.fonnte.com" }
+  ],
+  "share_target": {
+    "action": "https://zettbos.github.io/Private-Mentoring/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+zettbos",
+      "url": "https://zettbos.github.io/Private-Mentoring/?action=%s"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Antrean Tindakan",
+      "short_name": "Tindakan",
+      "description": "Buka antrean member perlu tindakan",
+      "url": "./index.html#queue",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Pembelian Lynk.id",
+      "short_name": "Lynk.id",
+      "description": "Buka rekap transaksi Lynk.id",
+      "url": "./index.html#unfilled",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Whitelist LMS",
+      "short_name": "Whitelist",
+      "description": "Buka antrean whitelist member",
+      "url": "./index.html#whitelist",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "categories": [
+    "business",
+    "productivity"
+  ]
+}
